@@ -6,13 +6,16 @@ import {
   Param,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ProductService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('add')
   addProduct(
     @Body('title') prodTitle: string,
@@ -27,16 +30,19 @@ export class ProductsController {
     return { id: generatedId };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('load')
   getAllProducts() {
     return { products: this.productsService.getProducts() };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   getProduct(@Param('id') prodId: string) {
     return this.productsService.getSingleProduct(prodId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   updateProduct(
     @Param('id') prodId: string,
@@ -47,7 +53,8 @@ export class ProductsController {
     this.productsService.updateProduct(prodId, prodTitle, prodDesc, prodPrice);
     return null;
   }
-
+  
+  @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   removeProduct(@Param('id') prodId: string) {
     this.productsService.deleteProduct(prodId);
