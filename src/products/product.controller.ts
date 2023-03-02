@@ -8,21 +8,21 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ProductService } from './products.service';
+//import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ProductService } from './product.service';
 
 @Controller('products')
-export class ProductsController {
+export class ProductController {
   constructor(private productsService: ProductService) {}
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Post('add')
   addProduct(
     @Body('title') prodTitle: string,
     @Body('description') prodDesc: string,
     @Body('price') prodPrice: number,
   ) {
-    const generatedId = this.productsService.insertProduct(
+    const generatedId = this.productsService.createProduct(
       prodTitle,
       prodDesc,
       prodPrice,
@@ -30,19 +30,19 @@ export class ProductsController {
     return { id: generatedId };
   }
 
-  @UseGuards(JwtAuthGuard)
+ // @UseGuards(JwtAuthGuard)
   @Get('load')
   getAllProducts() {
-    return { products: this.productsService.getProducts() };
+    return { products: this.productsService.getAllProducts() };
   }
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Get(':id')
   getProduct(@Param('id') prodId: string) {
-    return this.productsService.getSingleProduct(prodId);
+    return this.productsService.getProductById(prodId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Patch(':id')
   updateProduct(
     @Param('id') prodId: string,
@@ -54,7 +54,7 @@ export class ProductsController {
     return null;
   }
   
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   removeProduct(@Param('id') prodId: string) {
     this.productsService.deleteProduct(prodId);
