@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { ProductEntity } from './product.entity';
 //import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ProductService } from './product.service';
 
@@ -17,47 +18,48 @@ export class ProductController {
 
   //@UseGuards(JwtAuthGuard)
   @Post('add')
-  addProduct(
+  async addProduct(
     @Body('title') prodTitle: string,
     @Body('description') prodDesc: string,
     @Body('price') prodPrice: number,
-  ) {
-    const generatedId = this.productsService.createProduct(
+  ): Promise<{ generated_product_key: string }> {
+    const generated_product_key = await this.productsService.createProduct(
       prodTitle,
       prodDesc,
       prodPrice,
     );
-    return { id: generatedId };
+    return Promise.resolve({ generated_product_key });
   }
+  
 
  // @UseGuards(JwtAuthGuard)
   @Get('load')
-  getAllProducts() {
-    return { products: this.productsService.getAllProducts() };
+  async getAllProducts(): Promise<ProductEntity[]>{
+    return  await this.productsService.getAllProducts();
   }
 
   //@UseGuards(JwtAuthGuard)
-  @Get(':id')
-  getProduct(@Param('id') prodId: string) {
-    return this.productsService.getProductById(prodId);
+  @Get(':product_key')
+  getProduct(@Param('product_key') prodId: string) {
+    return this.productsService.getProductByProductKey(prodId);
   }
 
   //@UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Patch(':product_key')
   updateProduct(
-    @Param('id') prodId: string,
+    @Param('product_key') product_key: string,
     @Body('title') prodTitle: string,
     @Body('description') prodDesc: string,
     @Body('price') prodPrice: number,
   ) {
-    this.productsService.updateProduct(prodId, prodTitle, prodDesc, prodPrice);
+    this.productsService.updateProduct(product_key, prodTitle, prodDesc, prodPrice);
     return null;
   }
   
   //@UseGuards(JwtAuthGuard)
-  @Delete('delete/:id')
-  removeProduct(@Param('id') prodId: string) {
-    this.productsService.deleteProduct(prodId);
+  @Delete('delete/:product_key')
+  removeProduct(@Param('product_key') product_key: string) {
+    this.productsService.deleteProduct(product_key);
     return null;
   }
 }

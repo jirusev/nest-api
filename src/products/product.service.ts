@@ -2,8 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductEntity } from './product.entity';
-import { Product } from './product.interface';
-import {uuid} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ProductService {
@@ -13,39 +12,39 @@ export class ProductService {
   ) {}
 
   async createProduct(title: string, desc: string, price: number): Promise<string> {
-    const id = uuid();
-
+    let product_key = uuidv4();
     const newProduct = this.productRepository.create({
-      id,
+      product_key,
       title,
       description: desc,
       price,
     });
+    
     await this.productRepository.save(newProduct);
 
-    return newProduct.id;
+    return product_key;
   }
 
   async getAllProducts(): Promise<ProductEntity[]> {
     return await this.productRepository.find();
   }
 
-  async getProductById(id: string): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne({ where: { id } });
+  async getProductByProductKey(product_key: string): Promise<ProductEntity> {
+    const product = await this.productRepository.findOne({ where: { product_key } });
     if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found.`);
+      throw new NotFoundException(`Product with product_key ${product_key} not found.`);
     }
     return product;
   }
   
 
   async updateProduct(
-    id: string,
+    product_key: string,
     title?: string,
     desc?: string,
     price?: number,
   ): Promise<ProductEntity> {
-    const product = await this.getProductById(id);
+    const product = await this.getProductByProductKey(product_key);
     if (title) {
       product.title = title;
     }
@@ -59,8 +58,8 @@ export class ProductService {
     return product;
   }
 
-  async deleteProduct(id: string): Promise<void> {
-    const product = await this.getProductById(id);
+  async deleteProduct(product_key: string): Promise<void> {
+    const product = await this.getProductByProductKey(product_key);
     await this.productRepository.remove(product);
   }
 }

@@ -2,8 +2,11 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class ProductEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @Column()
-  id: string;
+  product_key:string
 
   @Column()
   title: string;
